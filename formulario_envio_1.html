@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Datos de Envío</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --azul:#1a3a5c;--azul2:#2563a8;--amarillo:#f5c842;--amarillo2:#e8b800;
+  --bg:#f4f6fa;--blanco:#fff;--borde:#dde3ee;--texto:#1a2236;
+  --muted:#6b7a99;--verde:#16a34a;--radio:10px;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--texto);min-height:100vh}
+
+header{background:var(--azul);padding:18px 24px;display:flex;align-items:center;gap:14px}
+.logo{width:40px;height:40px;background:var(--amarillo);border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:18px;color:var(--azul);flex-shrink:0}
+header h1{color:#fff;font-size:17px;font-weight:600}
+header p{color:rgba(255,255,255,.6);font-size:12px;margin-top:2px}
+
+.container{max-width:560px;margin:0 auto;padding:24px 16px 60px}
+
+/* PROGRESS */
+.progress{display:flex;align-items:center;gap:0;margin-bottom:28px}
+.step-dot{width:28px;height:28px;border-radius:50%;border:2px solid var(--borde);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:var(--muted);background:var(--blanco);flex-shrink:0;transition:.2s}
+.step-dot.active{border-color:var(--azul2);color:var(--azul2)}
+.step-dot.done{background:var(--verde);border-color:var(--verde);color:#fff}
+.step-line{flex:1;height:2px;background:var(--borde);transition:.3s}
+.step-line.done{background:var(--verde)}
+
+/* CARDS */
+.card{background:var(--blanco);border:1.5px solid var(--borde);border-radius:14px;padding:22px;margin-bottom:14px}
+.card-title{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:18px}
+
+/* TIPO ENVIO */
+.tipo-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.tipo-btn{border:2px solid var(--borde);border-radius:12px;padding:20px 14px;cursor:pointer;background:var(--blanco);text-align:center;transition:.15s;display:flex;flex-direction:column;align-items:center;gap:10px}
+.tipo-btn:hover{border-color:var(--azul2);background:#f0f5ff}
+.tipo-btn.selected{border-color:var(--azul2);background:#f0f5ff}
+.tipo-btn.selected .tipo-check{display:flex}
+.tipo-icon{font-size:32px;line-height:1}
+.tipo-label{font-size:15px;font-weight:600;color:var(--texto)}
+.tipo-desc{font-size:12px;color:var(--muted);line-height:1.4}
+.tipo-check{width:20px;height:20px;border-radius:50%;background:var(--azul2);display:none;align-items:center;justify-content:center;font-size:11px;color:#fff;margin-top:4px}
+
+/* FORM */
+.field{margin-bottom:16px}
+.field:last-child{margin-bottom:0}
+label{display:block;font-size:13px;font-weight:500;color:var(--texto);margin-bottom:5px}
+.req{color:var(--azul2)}
+input,select{width:100%;height:44px;padding:0 14px;border:1.5px solid var(--borde);border-radius:var(--radio);font-family:'DM Sans',sans-serif;font-size:15px;color:var(--texto);background:var(--blanco);appearance:none;outline:none;transition:.15s}
+input:focus,select:focus{border-color:var(--azul2);box-shadow:0 0 0 3px rgba(37,99,168,.1)}
+select:disabled{background:#f0f2f7;color:var(--muted);cursor:not-allowed}
+.select-wrap{position:relative}
+.select-wrap::after{content:'▾';position:absolute;right:13px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+/* SUCURSAL INFO */
+.suc-info{background:#f0f5ff;border:1.5px solid #c8d6e8;border-radius:var(--radio);padding:14px 16px;margin-top:14px;display:none}
+.suc-info.visible{display:block}
+.suc-row{display:flex;gap:8px;font-size:13px;margin-bottom:6px;align-items:flex-start}
+.suc-row:last-child{margin-bottom:0}
+.suc-lbl{color:var(--muted);min-width:70px;font-weight:500;flex-shrink:0}
+.suc-val{color:var(--azul);font-weight:500;line-height:1.4}
+
+/* BTN */
+.btn{width:100%;height:50px;background:var(--amarillo);color:var(--azul);border:none;border-radius:var(--radio);font-family:'DM Sans',sans-serif;font-size:16px;font-weight:600;cursor:pointer;transition:.15s;margin-top:8px}
+.btn:hover{background:var(--amarillo2)}
+.btn:active{transform:scale(.98)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+
+/* HIDDEN */
+.hidden{display:none}
+
+/* SUCCESS */
+.success{background:var(--blanco);border:1.5px solid #86efac;border-radius:14px;padding:32px 24px;text-align:center;display:none}
+.success.visible{display:block}
+.suc-icon{width:56px;height:56px;background:var(--verde);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:26px;color:#fff}
+.success h2{font-size:20px;font-weight:600;color:#15803d;margin-bottom:8px}
+.success p{font-size:14px;color:#166534;line-height:1.6}
+.success .detalle{background:#f0fdf4;border-radius:10px;padding:14px;margin-top:16px;text-align:left;font-size:13px;color:#166534;line-height:2}
+.success .detalle strong{color:#15803d}
+
+@media(max-width:480px){
+  .tipo-grid{grid-template-columns:1fr}
+  .row2{grid-template-columns:1fr}
+  .card{padding:18px 14px}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">CA</div>
+  <div>
+    <h1>Datos de envío</h1>
+    <p>Completá los datos para coordinar tu pedido</p>
+  </div>
+</header>
+
+<div class="container">
+
+  <div class="progress">
+    <div class="step-dot active" id="sd1">1</div>
+    <div class="step-line" id="sl1"></div>
+    <div class="step-dot" id="sd2">2</div>
+    <div class="step-line" id="sl2"></div>
+    <div class="step-dot" id="sd3">3</div>
+  </div>
+
+  <form id="form" novalidate>
+
+    <!-- PASO 1: TIPO DE ENVIO -->
+    <div class="card" id="bloqueTipo">
+      <div class="card-title">¿Cómo querés recibir tu pedido?</div>
+      <div class="tipo-grid">
+        <button type="button" class="tipo-btn" id="btnDomicilio" onclick="elegirTipo('domicilio')">
+          <span class="tipo-icon">🏠</span>
+          <span class="tipo-label">Envío a domicilio</span>
+          <span class="tipo-desc">Lo recibís en tu casa</span>
+          <span class="tipo-check">✓</span>
+        </button>
+        <button type="button" class="tipo-btn" id="btnSucursal" onclick="elegirTipo('sucursal')">
+          <span class="tipo-icon">🏪</span>
+          <span class="tipo-label">Retiro en sucursal</span>
+          <span class="tipo-desc">Correo Argentino</span>
+          <span class="tipo-check">✓</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- PASO 2: DATOS PERSONALES -->
+    <div class="card hidden" id="bloqueDatos">
+      <div class="card-title">Tus datos</div>
+      <div class="field">
+        <label>Nombre completo <span class="req">*</span></label>
+        <input type="text" id="nombre" placeholder="Ej: Juan Pérez" required>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label>Email <span class="req">*</span></label>
+          <input type="email" id="email" placeholder="tu@email.com" required>
+        </div>
+        <div class="field">
+          <label>Teléfono <span class="req">*</span></label>
+          <input type="tel" id="telefono" placeholder="11 2345-6789" required>
+        </div>
+      </div>
+    </div>
+
+    <!-- PASO 3A: DOMICILIO -->
+    <div class="card hidden" id="bloqueDomicilio">
+      <div class="card-title">Dirección de entrega</div>
+      <div class="field">
+        <label>Calle y número <span class="req">*</span></label>
+        <input type="text" id="calle" placeholder="Ej: San Martín 1234">
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label>Piso / Depto</label>
+          <input type="text" id="piso" placeholder="Ej: 3° B">
+        </div>
+        <div class="field">
+          <label>Código postal <span class="req">*</span></label>
+          <input type="text" id="cpDomicilio" placeholder="Ej: 1414">
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label>Localidad <span class="req">*</span></label>
+          <input type="text" id="ciudadDomicilio" placeholder="Ej: Palermo">
+        </div>
+        <div class="field">
+          <label>Provincia <span class="req">*</span></label>
+          <input type="text" id="provinciaDomicilio" placeholder="Ej: Buenos Aires">
+        </div>
+      </div>
+      <div class="field">
+        <label>Indicaciones para el repartidor</label>
+        <input type="text" id="indicaciones" placeholder="Ej: Timbre roto, llamar al llegar">
+      </div>
+    </div>
+
+    <!-- PASO 3B: SUCURSAL -->
+    <div class="card hidden" id="bloqueSucursal">
+      <div class="card-title">Sucursal de retiro</div>
+      <div class="field">
+        <label>Provincia <span class="req">*</span></label>
+        <div class="select-wrap">
+          <select id="provincia" required>
+            <option value="">— Seleccioná una provincia —</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label>Localidad <span class="req">*</span></label>
+        <div class="select-wrap">
+          <select id="localidad" disabled required>
+            <option value="">— Primero elegí una provincia —</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label>Sucursal <span class="req">*</span></label>
+        <div class="select-wrap">
+          <select id="sucursal" disabled required>
+            <option value="">— Primero elegí una localidad —</option>
+          </select>
+        </div>
+      </div>
+      <div class="suc-info" id="sucInfo">
+        <div class="suc-row"><span class="suc-lbl">📍 Dirección</span><span class="suc-val" id="sucDir"></span></div>
+        <div class="suc-row"><span class="suc-lbl">📬 Cód. postal</span><span class="suc-val" id="sucCP"></span></div>
+      </div>
+    </div>
+
+    <button type="submit" class="btn hidden" id="btnEnviar">Confirmar datos de envío</button>
+
+  </form>
+
+  <div class="success" id="successBox">
+    <div class="suc-icon">✓</div>
+    <h2>¡Recibimos tus datos!</h2>
+    <p>Gracias, <strong id="sNombre"></strong>. Nos ponemos en contacto a la brevedad para coordinar el envío.</p>
+    <div class="detalle" id="sDetalle"></div>
+  </div>
+
+</div>
+
+<script>
+const DB=[["Ciudad Autónoma de Buenos Aires","CIUDAD AUTONOMA BUENOS AIRES","ABASTO","AVENIDA CORRIENTES N° 3702","C1194AAX"],["Ciudad Autónoma de Buenos Aires","CIUDAD AUTONOMA BUENOS AIRES","ALMAGRO","AVENIDA MEDRANO N° 66","C1179AAB"],["Ciudad Autónoma de Buenos Aires","CIUDAD AUTONOMA BUENOS AIRES","BELGRANO","AVENIDA CABILDO N° 2349","C1428AAG"],["Ciudad Autónoma de Buenos Aires","CIUDAD AUTONOMA BUENOS AIRES","CABALLITO","AVENIDA RIVADAVIA N° 5337","C1406FEG"],["Ciudad Autónoma de Buenos Aires","CIUDAD AUTONOMA BUENOS AIRES","CENTRO","CALLE PERON TENIENTE GENERAL JUAN DOMINGO N° 321","C1038AAD"],["Ciudad Autónoma de Buenos Aires","CIUDAD AUTONOMA BUENOS AIRES","CHACARITA","AVENIDA LACROZE FEDERICO N° 4164","C1427DSH"],["Ciudad Autónoma de Buenos Aires","CIUDAD AUTONOMA BUENOS AIRES","CONGRESO","AVENIDA CALLAO N° 131","C1022AAB"],["Ciudad Autónoma de Buenos Aires","CIUDAD AUTONOMA BUENOS AIRES","FLORES","CALLE ARTIGAS GENERAL JOSE GERVASIO N° 40","C1406EAA"],["Ciudad Autónoma de Buenos Aires","CIUDAD AUTONOMA BUENOS AIRES","FLORESTA","AVENIDA CARRASCO N° 31","C1407EAA"],["Ciudad Autónoma de Buenos Aires","CIUDAD AUTONOMA BUENOS AIRES","LA BOCA","AVENIDA BROWN ALMIRANTE N° 780","C1155ADE"],["Ciudad Autónoma de Buenos Aires","CIUDAD AUTONOMA BUENOS AIRES","LINIERS","AVENIDA RIVADAVIA N° 11065","C1408FWA"],["Ciudad Autónoma de Buenos Aires","CIUDAD AUTONOMA BUENOS AIRES","MATADEROS","AVENIDA ALBERDI JUAN BAUTISTA N° 5924","C1440BAE"],["Ciudad Autónoma de Buenos Aires","CIUDAD AUTONOMA BUENOS AIRES","MONSERRAT","AVENIDA ENTRE RIOS N° 452","C1080ABJ"],["Ciudad Autónoma de Buenos Aires","CIUDAD AUTONOMA BUENOS AIRES","NUEVA POMPEYA","AVENIDA DEL BARCO CENTENERA N° 2933","C1264AAH"],["Ciudad Autónoma de Buenos Aires","CIUDAD AUTONOMA BUENOS AIRES","NUÑEZ","AVENIDA CABILDO N° 4576","C1429BQH"],["Ciudad Autónoma de Buenos Aires","CIUDAD AUTONOMA BUENOS AIRES","OBELISCO","CALLE CERRITO N° 368","C1010AAH"],["Ciudad Autónoma de Buenos Aires","CIUDAD AUTONOMA BUENOS AIRES","ONCE","CALLE PERON TENIENTE GENERAL JUAN DOMINGO N° 2821","C1198AAJ"],["Ciudad Autónoma de Buenos Aires","CIUDAD AUTONOMA BUENOS AIRES","PALERMO","AVENIDA DIAZ CORONEL N° 2190","C1425DUF"],["Ciudad Autónoma de Buenos Aires","CIUDAD AUTONOMA BUENOS AIRES","PARQUE CHACABUCO","AVENIDA CURAPALIGUE N° 815","C1437AAN"],["Ciudad Autónoma de Buenos Aires","CIUDAD AUTONOMA BUENOS AIRES","PARQUE PATRICIOS","AVENIDA CASEROS N° 2459","C1264AAA"],["Ciudad Autónoma de Buenos Aires","CIUDAD AUTONOMA BUENOS AIRES","SAAVEDRA","CALLE PLAZA N° 3855","C1431FIJ"],["Ciudad Autónoma de Buenos Aires","CIUDAD AUTONOMA BUENOS AIRES","SAN TELMO","CALLE IRIGOYEN DOCTOR BERNARDO DE N° 698","C1072AAP"],["Ciudad Autónoma de Buenos Aires","CIUDAD AUTONOMA BUENOS AIRES","TRIBUNALES 1","CALLE PARANA N° 777","C1017AAO"],["Ciudad Autónoma de Buenos Aires","CIUDAD AUTONOMA BUENOS AIRES","VILLA CRESPO","AVENIDA SCALABRINI ORTIZ RAUL N° 176","C1414CMC"],["Ciudad Autónoma de Buenos Aires","CIUDAD AUTONOMA BUENOS AIRES","VILLA DEL PARQUE","CALLE HELGUERA N° 2901","C1419CTI"],["Ciudad Autónoma de Buenos Aires","CIUDAD AUTONOMA BUENOS AIRES","VILLA LUGANO","CALLE MURGUIONDO N° 3961","C1439BHI"],["Ciudad Autónoma de Buenos Aires","CIUDAD AUTONOMA BUENOS AIRES","VILLA URQUIZA","CALLE MONROE N° 5254","C1431FIK"],["Buenos Aires","ACASSUSO","ACASSUSO","AVENIDA SANTA FE N° 766","B1641ZAA"],["Buenos Aires","ADROGUE","ALMIRANTE BROWN","DIAGONAL BROWN N° 1298","B1846ZAC"],["Buenos Aires","AVELLANEDA","AVELLANEDA","AVENIDA BELGRANO N° 390","B1870ZAB"],["Buenos Aires","AZUL","AZUL","CALLE YRIGOYEN N° 549","B7300XAB"],["Buenos Aires","BAHIA BLANCA","BAHIA BLANCA","CALLE MORENO N° 34","B8000GCB"],["Buenos Aires","BANFIELD","BANFIELD","AVENIDA ALSINA N° 658","B1828ZAA"],["Buenos Aires","BERAZATEGUI","BERAZATEGUI","CALLE 15 N° 4751","B1880ZAB"],["Buenos Aires","BOULOGNE","BOULOGNE","AVENIDA MARADONA N° 2384","B1609ZAA"],["Buenos Aires","CAMPANA","CAMPANA","CALLE SAN MARTIN N° 274","B2804XAB"],["Buenos Aires","CAÑUELAS","CAÑUELAS","CALLE SAN MARTIN N° 466","B1814XAB"],["Buenos Aires","CASEROS","CASEROS","AVENIDA URQUIZA N° 4826","B1678ZAA"],["Buenos Aires","CASTELAR","CASTELAR","CALLE IRIGOYEN N° 484","B1712ZAA"],["Buenos Aires","CHACABUCO","CHACABUCO","CALLE ALBERDI N° 57","B6740XAB"],["Buenos Aires","CHIVILCOY","CHIVILCOY","CALLE BELGRANO N° 7","B6620XAA"],["Buenos Aires","CIUDADELA","CIUDADELA","AVENIDA RIVADAVIA N° 12650","B1702ZAA"],["Buenos Aires","DEL VISO","DEL VISO","AVENIDA MADERO N° 1395","B1669ZAA"],["Buenos Aires","DON TORCUATO","DON TORCUATO","AVENIDA ALVEAR N° 1626","B1611ZAB"],["Buenos Aires","EZEIZA","EZEIZA","CALLE FRENCH N° 198","B1802ZAA"],["Buenos Aires","EZPELETA","EZPELETA","CALLE CHILE N° 379","B1882ZAA"],["Buenos Aires","FLORIDA","FLORIDA","AVENIDA SAN MARTIN N° 2849","B1602ZAA"],["Buenos Aires","FLORENCIO VARELA","FLORENCIO VARELA","CALLE ESPAÑA N° 3212","B1888ZAC"],["Buenos Aires","GARIN","GARIN","CALLE CASTELAR N° 974","B1619ZAA"],["Buenos Aires","GENERAL PACHECO","GENERAL PACHECO","AVENIDA CONSTITUYENTES N° 532","B1617ZAB"],["Buenos Aires","GENERAL RODRIGUEZ","GRAL. RODRIGUEZ","AVENIDA DEL LIBERTADOR N° 233","B1748ZAA"],["Buenos Aires","GENERAL SAN MARTIN","SAN MARTIN","CALLE CAMPOS N° 1951","B1650ZAB"],["Buenos Aires","GERLI","GERLI","AVENIDA YRIGOYEN N° 2317","B1823ZAA"],["Buenos Aires","GRAND BOURG","GRAND BOURG","CALLE SEGUI N° 1722","B1615ZAB"],["Buenos Aires","HAEDO","HAEDO","AVENIDA RIVADAVIA N° 16380","B1706ZAA"],["Buenos Aires","HURLINGHAM","HURLINGHAM","RUTA PROVINCIAL N° 1008","B1686ZAB"],["Buenos Aires","ISIDRO CASANOVA","ISIDRO CASANOVA","AVENIDA ROSAS N° 6801","B1765ZAA"],["Buenos Aires","ITUZAINGO","ITUZAINGO","CALLE OLAZABAL N° 728","B1714ZAA"],["Buenos Aires","JOSE C PAZ","JOSE C. PAZ","CALLE SAENZ PEÑA N° 5009","B1665ZAB"],["Buenos Aires","JOSE MARMOL","JOSE MARMOL","CALLE MITRE N° 2204","B1845ZAA"],["Buenos Aires","JUNIN","JUNIN","AVENIDA RIVADAVIA N° 5","B6000XAA"],["Buenos Aires","LA PLATA","LA PLATA","AVENIDA 51 N° 456","B1900ZAA"],["Buenos Aires","LA TABLADA","LA TABLADA","AVENIDA CROVARA N° 3035","B1766ZAA"],["Buenos Aires","LANUS","LANUS","CALLE O HIGGINS N° 2055","B1824ZAB"],["Buenos Aires","LOMAS DE ZAMORA","LOMAS DE ZAMORA","CALLE ALEM N° 300","B1832ZAA"],["Buenos Aires","LOMAS DEL MIRADOR","LOMAS DEL MIRADOR","AVENIDA ROSAS N° 691","B1752ZAA"],["Buenos Aires","LOS POLVORINES","LOS POLVORINES","CALLE RIVADAVIA N° 2645","B1613ZAB"],["Buenos Aires","LUJAN","LUJAN","CALLE MITRE N° 571","B6700XAA"],["Buenos Aires","MAR DEL PLATA","MAR DEL PLATA","AVENIDA LURO N° 2460","B7600XAA"],["Buenos Aires","MARTINEZ","MARTINEZ","AVENIDA SANTA FE N° 2052","B1640ZAA"],["Buenos Aires","MERCEDES","MERCEDES","AVENIDA 29 N° 645","B6600XAA"],["Buenos Aires","MERLO","MERLO","AVENIDA DEL LIBERTADOR N° 556","B1722ZAB"],["Buenos Aires","MIRAMAR","MIRAMAR","CALLE 17 N° 1602","B7607XAA"],["Buenos Aires","MONTE GRANDE","MONTE GRANDE","CALLE LOPEZ VICENTE FIDEL N° 448","B1842ZAA"],["Buenos Aires","MORENO","MORENO","CALLE ESPAÑA N° 416","B1744ZAA"],["Buenos Aires","MORON","MORON","CALLE URUGUAY N° 346","B1708ZAA"],["Buenos Aires","NECOCHEA","NECOCHEA","AVENIDA 58 N° 3088","B7630XAA"],["Buenos Aires","OLAVARRIA","OLAVARRIA","CALLE PAZ GENERAL N° 2973","B7400XAA"],["Buenos Aires","OLIVOS","OLIVOS","AVENIDA MAIPU N° 2683","B1636ZAB"],["Buenos Aires","PERGAMINO","PERGAMINO","CALLE MERCED N° 173","B2700XAA"],["Buenos Aires","PILAR","PILAR","CALLE LAGRAVE N° 681","B1629ZAA"],["Buenos Aires","PINAMAR","PINAMAR","CALLE ENEAS N° 51","B7167XAA"],["Buenos Aires","QUILMES","QUILMES","CALLE YRIGOYEN N° 405","B1878ZAA"],["Buenos Aires","RAMOS MEJIA","RAMOS MEJIA","AVENIDA RIVADAVIA N° 14178","B1704ZAA"],["Buenos Aires","REMEDIOS DE ESCALADA","REMEDIOS DE ESCALADA","AVENIDA YRIGOYEN N° 6133","B1826ZAB"],["Buenos Aires","SALADILLO","SALADILLO","AVENIDA RIVADAVIA N° 3001","B7260XAA"],["Buenos Aires","SAN ANTONIO DE ARECO","SAN A. DE ARECO","CALLE DEL VALLE N° 355","B2760XAA"],["Buenos Aires","SAN ANTONIO DE PADUA","SAN ANTONIO DE PADUA","CALLE DIRECTORIO N° 202","B1718ZAA"],["Buenos Aires","SAN FERNANDO","SAN FERNANDO","AVENIDA PERON N° 438","B1646ZAB"],["Buenos Aires","SAN ISIDRO","SAN ISIDRO","CALLE ALSINA N° 102","B1642ZAB"],["Buenos Aires","SAN JUSTO","SAN JUSTO","CALLE ALMAFUERTE N° 3171","B1754ZAB"],["Buenos Aires","SAN MIGUEL","SAN MIGUEL","CALLE BELGRANO N° 1398","B1663ZAB"],["Buenos Aires","SAN NICOLAS DE LOS ARROYOS","SAN NICOLAS","CALLE DE LA NACION N° 175","B2900XAA"],["Buenos Aires","SAN PEDRO","SAN PEDRO","CALLE SAAVEDRA N° 145","B2930XAA"],["Buenos Aires","TANDIL","TANDIL","CALLE PINTO N° 623","B7000XAA"],["Buenos Aires","TEMPERLEY","TEMPERLEY","AVENIDA BROWN N° 3394","B1834ZAB"],["Buenos Aires","TIGRE","TIGRE","AVENIDA CAZON N° 1140","B1648ZAB"],["Buenos Aires","TRENQUE LAUQUEN","TRENQUE LAUQUEN","AVENIDA ROCA N° 542","B6400XAA"],["Buenos Aires","TRES ARROYOS","TRES ARROYOS","AVENIDA MORENO N° 218","B7500XAA"],["Buenos Aires","VALENTIN ALSINA","VALENTIN ALSINA","CALLE FARREL N° 664","B1822ZAB"],["Buenos Aires","VICTORIA","VICTORIA","AVENIDA PERON N° 2579","B1644ZAA"],["Buenos Aires","VICENTE LOPEZ","VICENTE LOPEZ","AVENIDA DEL LIBERTADOR N° 1202","B1638ZAC"],["Buenos Aires","VILLA ADELINA","VILLA ADELINA","AVENIDA PARANA N° 6001","B1607ZAB"],["Buenos Aires","VILLA BALLESTER","VILLA BALLESTER","CALLE LOPEZ VICENTE FIDEL N° 3044","B1653ZAA"],["Buenos Aires","VILLA LYNCH","VILLA LYNCH","CALLE LIBANO N° 4041","B1672ZAA"],["Buenos Aires","VILLA MARTELLI","VILLA MARTELLI","CALLE LAPRIDA N° 3586","B1603ZAA"],["Buenos Aires","ZARATE","ZARATE","CALLE PAGOLA N° 35","B2800XAA"],["Catamarca","SAN FDO DEL VALLE DE CATAMARCA","CATAMARCA","CALLE SAN MARTIN N° 761","K4700XAA"],["Catamarca","ANDALGALA","ANDALGALA","CALLE RIVADAVIA N° 198","K4740XAA"],["Catamarca","BELEN","BELEN","CALLE SAN MARTIN N° 543","K4750XAA"],["Catamarca","RECREO","RECREO","AVENIDA SABAGH N° 100","K4730XAA"],["Catamarca","SANTA MARIA","SANTA MARIA","CALLE DE LA QUINTANA N° 375","K4120XAA"],["Catamarca","TINOGASTA","TINOGASTA","CALLE MORENO N° 785","K4760XAA"],["Chaco","RESISTENCIA","RESISTENCIA","AVENIDA SARMIENTO N° 102","H3500XAA"],["Chaco","BARRANQUERAS","BARRANQUERAS","DIAGONAL PERON EVA N° 340","H3503XAA"],["Chaco","CHARATA","CHARATA","CALLE DE CARLO N° 490","H3730XAA"],["Chaco","FONTANA","FONTANA","CALLE MORENO N° 4644","H3514ZAA"],["Chaco","GENERAL SAN MARTIN","GRAL. SAN MARTIN","CALLE URUGUAY N° 490","H3450XAA"],["Chaco","GENERAL PINEDO","GRAL. PINEDO","CALLE MORENO N° 502","H3740XAA"],["Chaco","JUAN JOSE CASTELLI","J.J. CASTELLI","CALLE SARMIENTO N° 355","H3705XAA"],["Chaco","LAS BREÑAS","LAS BREÑAS","CALLE RIVADAVIA N° 1031","H3722XAA"],["Chaco","PRESIDENCIA ROQUE SAENZ PEÑA","P.R.S. PEÑA","CALLE BELGRANO N° 601","H3700XAA"],["Chaco","VILLA ANGELA","VILLA ANGELA","CALLE 1 DE MAYO N° 299","H3540XAA"],["Chubut","COMODORO RIVADAVIA","COMODORO RIVADAVIA","CALLE SAN MARTIN N° 180","U9003XAA"],["Chubut","ESQUEL","ESQUEL","AVENIDA ALVEAR N° 1192","U9200XAA"],["Chubut","PUERTO MADRYN","PUERTO MADRYN","CALLE MAIZ N° 293","U9120XAA"],["Chubut","RAWSON","RAWSON","CALLE VACCHINA N° 22","U9103XAA"],["Chubut","TRELEW","TRELEW","CALLE MITRE N° 315","U9100XAA"],["Chubut","TREVELIN","TREVELIN","AVENIDA SAN MARTIN N° 99","U9203XAA"],["Córdoba","CORDOBA","CORDOBA","AVENIDA COLON N° 210","X5000ZAA"],["Córdoba","RIO CUARTO","RIO CUARTO","CALLE PAZ GENERAL N° 624","X5800XAA"],["Córdoba","VILLA MARIA","VILLA MARÍA","CALLE CATAMARCA N° 1190","X5900XAA"],["Córdoba","ALTA GRACIA","ALTA GRACIA","AVENIDA LIBERTADOR N° 577","X5186XAA"],["Córdoba","BELL VILLE","BELL VILLE","CALLE CORDOBA N° 599","X2400XAA"],["Córdoba","COSQUIN","COSQUIN","CALLE CORRIENTES N° 618","X5166XAA"],["Córdoba","CRUZ DEL EJE","CRUZ DEL EJE","CALLE ALVEAR N° 403","X5280XAA"],["Córdoba","DEAN FUNES","DEAN FUNES","CALLE RIVADAVIA N° 200","X5300XAA"],["Córdoba","JESUS MARIA","JESUS MARIA","CALLE SARMIENTO N° 15","X5220XAA"],["Córdoba","LA CALERA","LA CALERA","AVENIDA SAN MARTIN N° 209","X5151XAA"],["Córdoba","LA CARLOTA","LA CARLOTA","CALLE PAZ GENERAL N° 1","X2670XAA"],["Córdoba","LA CUMBRE","LA CUMBRE","CALLE COLON N° 60","X5178XAA"],["Córdoba","LA FALDA","LA FALDA","AVENIDA ARGENTINA N° 184","X5172XAA"],["Córdoba","LABOULAYE","LABOULAYE","AVENIDA INDEPENDENCIA N° 266","X2640XAA"],["Córdoba","MARCOS JUAREZ","MARCOS JUAREZ","AVENIDA ALEM N° 352","X2580XAA"],["Córdoba","MINA CLAVERO","MINA CLAVERO","AVENIDA SAN MARTIN N° 707","X5889XAA"],["Córdoba","MORTEROS","MORTEROS","CALLE ESPAÑA N° 964","X2421XAA"],["Córdoba","RIO TERCERO","RIO TERCERO","CALLE DE BUONO N° 81","X5850XAA"],["Córdoba","SAN FRANCISCO","SAN FRANCISCO","CALLE ALBERDI N° 198","X2400XAB"],["Córdoba","VILLA CARLOS PAZ","VILLA CARLOS PAZ","AVENIDA SAN MARTIN N° 199","X5152XAA"],["Córdoba","VILLA DOLORES","VILLA DOLORES","CALLE ITALIA N° 299","X5870XAA"],["Córdoba","VILLA GENERAL BELGRANO","VILLA GRAL. BELGRANO","AVENIDA SAN MARTIN N° 164","X5194XAA"],["Corrientes","CORRIENTES","CORRIENTES","CALLE SAN JUAN N° 1098","W3400XAA"],["Corrientes","CURUZU CUATIA","CURUZU CUATIA","CALLE BERON DE ASTRADA N° 999","W3460XAA"],["Corrientes","GOYA","GOYA","CALLE BELGRANO N° 942","W3450XAA"],["Corrientes","MERCEDES","MERCEDES","CALLE RIVADAVIA N° 599","W3470XAA"],["Corrientes","MONTE CASEROS","MONTE CASEROS","AVENIDA ALVEAR N° 1199","W3230XAA"],["Corrientes","PASO DE LOS LIBRES","PASO DE LOS LIBRES","CALLE SITJANIN N° 998","W3230XAB"],["Corrientes","SANTO TOME","SANTO TOME","AVENIDA BRASIL N° 805","W3340XAA"],["Entre Ríos","PARANA","PARANA","CALLE 25 DE MAYO N° 102","E3100XAA"],["Entre Ríos","CONCORDIA","CONCORDIA","CALLE YRIGOYEN N° 575","E3200XAA"],["Entre Ríos","COLON","COLON","CALLE 12 DE ABRIL N° 431","E3280XAA"],["Entre Ríos","CONCEPCION DEL URUGUAY","CONCEPCION DEL URUGUAY","CALLE GALARZA N° 712","E3260XAA"],["Entre Ríos","GUALEGUAY","GUALEGUAY","CALLE URQUIZA N° 128","E2840ZAA"],["Entre Ríos","GUALEGUAYCHU","GUALEGUAYCHU","CALLE URQUIZA N° 1036","E2820ZAA"],["Entre Ríos","NOGOYA","NOGOYA","CALLE 9 DE JULIO N° 701","E3150ZAA"],["Entre Ríos","VICTORIA","VICTORIA","CALLE MITRE N° 473","E3153XAA"],["Entre Ríos","VILLAGUAY","VILLAGUAY","CALLE MORENO N° 921","E3240XAA"],["Formosa","FORMOSA","FORMOSA","AVENIDA 9 DE JULIO N° 920","P3600XAA"],["Formosa","CLORINDA","CLORINDA","CALLE FERNANDEZ CANCIO N° 1401","P3612XAA"],["Formosa","EL COLORADO","EL COLORADO","CALLE CORRIENTES N° 100","P3620XAA"],["Formosa","LAS LOMITAS","LAS LOMITAS","AVENIDA SAN MARTIN N° 118","P3630XAA"],["Formosa","PIRANE","PIRANE","AVENIDA 9 DE JULIO N° 245","P3624XAA"],["Jujuy","SAN SALVADOR DE JUJUY","SAN SALVADOR DE JUJUY","CALLE BELGRANO N° 1136","Y4600XAA"],["Jujuy","ABRA PAMPA","ABRA PAMPA","CALLE SARMIENTO N° 490","Y4640XAA"],["Jujuy","HUMAHUACA","HUMAHUACA","CALLE BUENOS AIRES N° 199","Y4630XAA"],["Jujuy","LA QUIACA","LA QUIACA","AVENIDA SARMIENTO N° 207","Y4650XAA"],["Jujuy","LIBERTADOR GRAL SAN MARTIN","LIB. GRAL. SAN MARTIN","CALLE BELGRANO N° 495","Y4554XAA"],["Jujuy","PALPALA","PALPALA","CALLE SIRIA N° 101","Y4612XAA"],["Jujuy","PERICO","PERICO","AVENIDA SAN MARTIN N° 299","Y4608XAA"],["Jujuy","SAN PEDRO DE JUJUY","SAN PEDRO","CALLE SARMIENTO N° 280","Y4510XAA"],["Jujuy","TILCARA","TILCARA","CALLE RIVADAVIA N° 497","Y4624XAA"],["La Pampa","SANTA ROSA","SANTA ROSA","CALLE RIVADAVIA N° 202","L6300XAA"],["La Pampa","GENERAL PICO","GRAL. PICO","CALLE 22 N° 653","L6360XAA"],["La Pampa","GENERAL ACHA","GENERAL ACHA","CALLE CAMPOS N° 790","L6380XAA"],["La Rioja","LA RIOJA","LA RIOJA","AVENIDA PERON N° 258","F5300XAA"],["La Rioja","CHILECITO","CHILECITO","CALLE GONZALEZ N° 201","F5360XAA"],["La Rioja","CHAMICAL","CHAMICAL","CALLE 9 DE JULIO N° 100","F5380XAA"],["La Rioja","CHEPES","CHEPES","CALLE QUIROGA N° 125","F5370XAA"],["Mendoza","MENDOZA","MENDOZA","AVENIDA SAN MARTIN N° 678","M5500XAA"],["Mendoza","GODOY CRUZ","GODOY CRUZ","AVENIDA MORENO N° 50","M5501XAA"],["Mendoza","GENERAL ALVEAR","GRAL. ALVEAR","CALLE CHAPEAUROUGE N° 20","M5620XAA"],["Mendoza","LUJAN DE CUYO","LUJAN DE CUYO","CALLE AZCUENAGA N° 160","M5507XAA"],["Mendoza","MAIPU","MAIPU","CALLE SAN MARTIN N° 335","M5515XAA"],["Mendoza","MALARGUE","MALARGÜE","CALLE PUEBLA N° 102","M5613XAA"],["Mendoza","RIVADAVIA","RIVADAVIA","CALLE DEL VALLE N° 189","M5580XAA"],["Mendoza","SAN MARTIN","SAN MARTIN","CALLE 25 DE MAYO N° 389","M5570XAA"],["Mendoza","SAN RAFAEL","SAN RAFAEL","CALLE SAN LORENZO N° 69","M5600XAA"],["Mendoza","TUNUYAN","TUNUYAN","CALLE YRIGOYEN N° 721","M5560XAA"],["Misiones","POSADAS","POSADAS","CALLE BOLIVAR N° 2112","N3300XAA"],["Misiones","APOSTOLES","APOSTOLES","AVENIDA SARMIENTO N° 334","N3316XAA"],["Misiones","EL DORADO","EL DORADO","AVENIDA SAN MARTIN N° 1690","N3382XAA"],["Misiones","LEANDRO N ALEM","L. N. ALEM","AVENIDA GUEMES N° 1","N3315XAA"],["Misiones","OBERA","OBERÁ","CALLE SANTA FE N° 205","N3360XAA"],["Misiones","PUERTO IGUAZU","IGUAZU","AVENIDA SAN MARTIN N° 384","N3370XAA"],["Neuquén","NEUQUEN","NEUQUEN","CALLE SANTA FE N° 101","Q8300XAA"],["Neuquén","CHOS MALAL","CHOS MALAL","CALLE PAZ GENERAL N° 518","Q8353XAA"],["Neuquén","CUTRAL CO","CUTRAL CO","AVENIDA ROCA N° 660","Q8322XAA"],["Neuquén","JUNIN DE LOS ANDES","JUNIN DE LOS ANDES","CALLE DON BOSCO N° 602","Q8371XAA"],["Neuquén","PLOTTIER","PLOTTIER","CALLE ELORDI N° 160","Q8316XAA"],["Neuquén","SAN MARTIN DE LOS ANDES","SAN MARTIN DE LOS ANDES","CALLE ROCA N° 690","Q8370XAA"],["Neuquén","ZAPALA","ZAPALA","AVENIDA SAN MARTIN N° 324","Q8340XAA"],["Río Negro","VIEDMA","VIEDMA","CALLE RIVADAVIA N° 151","R8500XAA"],["Río Negro","ALLEN","ALLEN","CALLE ORELL N° 168","R8328XAA"],["Río Negro","BARILOCHE","S. C. DE BARILOCHE","CALLE ELFLEIN N° 860","R8400XAA"],["Río Negro","CATRIEL","CATRIEL","CALLE PRIMEROS POBLADORES N° 240","R8307XAA"],["Río Negro","CHOELE CHOEL","CHOELE CHOEL","AVENIDA SAN MARTIN N° 1298","R8360XAA"],["Río Negro","CIPOLLETTI","CIPOLLETTI","CALLE IBAÑEZ N° 5","R8324XAA"],["Río Negro","EL BOLSON","EL BOLSON","AVENIDA SAN MARTIN N° 2860","R8430XAA"],["Río Negro","GENERAL ROCA","GENERAL ROCA","AVENIDA ROCA N° 1462","R8332XAA"],["Río Negro","VILLA REGINA","VILLA REGINA","CALLE SARMIENTO N° 98","R8336XAA"],["Salta","SALTA","SALTA","CALLE DEAN FUNES N° 160","A4400ZAA"],["Salta","AGUARAY","AGUARAY","CALLE GUEMES N° 99","A4566ZAA"],["Salta","CAFAYATE","CAFAYATE","AVENIDA GUEMES N° 197","A4427ZAA"],["Salta","EMBARCACION","EMBARCACION","CALLE 24 DE SEPTIEMBRE N° 351","A4550ZAA"],["Salta","GENERAL GUEMES","GENERAL GUEMES","CALLE CABRED N° 201","A4430ZAA"],["Salta","JOAQUIN V GONZALEZ","JOAQUIN V GONZALEZ","CALLE BELGRANO N° 315","A4448ZAA"],["Salta","METAN","METAN","CALLE SIERRA N° 358","A4440ZAA"],["Salta","ROSARIO DE LA FRONTERA","ROSARIO DE LA FRONTERA","CALLE SALTA N° 296","A4190ZAA"],["Salta","SAN RAMON DE LA NUEVA ORAN","SAN RAMON DE LA NUEVA ORAN","AVENIDA LOPEZ Y PLANES N° 402","A4530ZAC"],["Salta","TARTAGAL","TARTAGAL","CALLE GUEMES N° 501","A4560ZAA"],["San Juan","SAN JUAN","SAN JUAN","AVENIDA DE LA ROZA N° 223","J5402ZAA"],["San Juan","CAUCETE","CAUCETE","CALLE BELGRANO N° 112","J5442ZAA"],["San Juan","CHIMBAS","CHIMBAS","CALLE MENDOZA N° 405","J5413ZAA"],["San Juan","JACHAL","JACHAL","CALLE SAN MARTIN N° 493","J5460ZAA"],["San Juan","MEDIA AGUA","MEDIA AGUA","CALLE TORRENT N° 59","J5435ZAA"],["San Juan","SANTA LUCIA","SANTA LUCIA","CALLE GORRITI N° 709","J5401ZAA"],["San Luis","SAN LUIS","SAN LUIS","CALLE SAN MARTIN N° 801","D5700XAA"],["San Luis","VILLA MERCEDES","VILLA MERCEDES","CALLE GUILLET N° 31","D5730XAA"],["San Luis","CONCARAN","CONCARAN","CALLE YRIGOYEN N° 534","D5870XAA"],["San Luis","MERLO","MERLO","CALLE MERCAU N° 579","D5881XAA"],["Santa Cruz","RIO GALLEGOS","RIO GALLEGOS","AVENIDA KIRCHNER N° 893","Z9400XAA"],["Santa Cruz","CALETA OLIVIA","CALETA OLIVIA","CALLE YRIGOYEN N° 194","Z9011XAA"],["Santa Cruz","EL CALAFATE","EL CALAFATE","AVENIDA DEL LIBERTADOR N° 1133","Z9405XAA"],["Santa Cruz","LAS HERAS","LAS HERAS","CALLE SAN MARTIN N° 300","Z9015XAA"],["Santa Cruz","PERITO MORENO","PERITO MORENO","AVENIDA PERON N° 1327","Z9040XAA"],["Santa Cruz","PUERTO DESEADO","PUERTO DESEADO","CALLE SAN MARTIN N° 1075","Z9050XAA"],["Santa Cruz","PUERTO SAN JULIAN","PUERTO SAN JULIAN","AVENIDA SAN MARTIN N° 155","Z9310XAA"],["Santa Cruz","RIO TURBIO","RIO TURBIO","AVENIDA DE LOS MINEROS N° 494","Z9407XAA"],["Santa Fe","ROSARIO","ROSARIO","CALLE CORDOBA N° 721","S2000ZAA"],["Santa Fe","SANTA FE","SANTA FE","CALLE MENDOZA N° 2430","S3000XAA"],["Santa Fe","CAÑADA DE GOMEZ","CAÑADA DE GOMEZ","CALLE SARMIENTO N° 96","S2500XAA"],["Santa Fe","CASILDA","CASILDA","CALLE DE LA TORRE N° 2371","S2170XAA"],["Santa Fe","ESPERANZA","ESPERANZA","CALLE SAN MARTIN N° 1231","S3080XAA"],["Santa Fe","FIRMAT","FIRMAT","CALLE BERUTTI N° 1135","S2630XAA"],["Santa Fe","RAFAELA","RAFAELA","CALLE MORENO N° 104","S2300XAA"],["Santa Fe","RECONQUISTA","RECONQUISTA","CALLE 9 DE JULIO N° 745","S3560XAA"],["Santa Fe","SAN LORENZO","SAN LORENZO","AVENIDA SAN MARTIN N° 1202","S2200XAA"],["Santa Fe","VENADO TUERTO","VENADO TUERTO","CALLE SAAVEDRA N° 497","S2600XAA"],["Santiago del Estero","SANTIAGO DEL ESTERO","SGO. DEL ESTERO","CALLE BUENOS AIRES N° 252","G4200XAA"],["Santiago del Estero","LA BANDA","LA BANDA","AVENIDA BELGRANO N° 261","G4300XAA"],["Santiago del Estero","AÑATUYA","AÑATUYA","AVENIDA BELGRANO N° 19","G3740XAA"],["Santiago del Estero","FRIAS","FRIAS","CALLE MONTI N° 50","G4230XAA"],["Santiago del Estero","TERMAS DE RIO HONDO","TERMAS DE RIO HONDO","AVENIDA ALBERDI N° 766","G4220XAA"],["Tierra del Fuego","USHUAIA","USHUAIA","AVENIDA SAN MARTIN N° 309","V9410XAA"],["Tierra del Fuego","RIO GRANDE","RIO GRANDE","CALLE RIVADAVIA N° 968","V9420XAA"],["Tierra del Fuego","TOLHUIN","TOLHUIN","CALLE BRIDGES N° 327","V9415XAA"],["Tucumán","SAN MIGUEL DE TUCUMAN","TUCUMAN","CALLE CORDOBA N° 540","T4000XAA"],["Tucumán","SAN MIGUEL DE TUCUMAN","TUCUMAN 1","CALLE ASUNCION N° 925","T4000XAB"],["Tucumán","SAN MIGUEL DE TUCUMAN","TUCUMAN 2","AVENIDA ALEM N° 340","T4000XAC"],["Tucumán","AGUILARES","AGUILARES","CALLE MARMOL N° 1","T4220XAA"],["Tucumán","ALDERETES","ALDERETES","AVENIDA RIVADAVIA N° 930","T4178ZAA"],["Tucumán","BANDA DEL RIO SALI","BDA. DE RIO SALI","CALLE SAN MARTIN N° 200","T4109ZAA"],["Tucumán","BELLA VISTA","BELLA VISTA","CALLE MARCONI N° 398","T4168ZAA"],["Tucumán","CONCEPCION","CONCEPCION","CALLE AVELLANEDA N° 305","T4146ZAA"],["Tucumán","LULES","LULES","CALLE QUILES N° 95","T4128ZAA"],["Tucumán","MONTEROS","MONTEROS","CALLE COLON N° 247","T4142ZAA"],["Tucumán","TAFI DEL VALLE","TAFI DEL VALLE","AVENIDA SAN MARTIN N° 1","T4137ZAA"],["Tucumán","TAFI VIEJO","TAFI VIEJO","CALLE MONTEAGUDO N° 15","T4103ZAA"],["Tucumán","YERBA BUENA","YERBA BUENA","AVENIDA ACONQUIJA N° 2021","T4107ZAA"]];
+
+let tipoEnvio = null;
+
+function elegirTipo(tipo) {
+  tipoEnvio = tipo;
+  document.getElementById('btnDomicilio').classList.toggle('selected', tipo==='domicilio');
+  document.getElementById('btnSucursal').classList.toggle('selected', tipo==='sucursal');
+
+  document.getElementById('bloqueDatos').classList.remove('hidden');
+  document.getElementById('bloqueDomicilio').classList.toggle('hidden', tipo!=='domicilio');
+  document.getElementById('bloqueSucursal').classList.toggle('hidden', tipo!=='sucursal');
+  document.getElementById('btnEnviar').classList.remove('hidden');
+
+  document.getElementById('sd2').classList.add('active');
+  document.getElementById('sl1').classList.add('done');
+  document.getElementById('sd1').classList.add('done');
+  document.getElementById('sd1').textContent = '✓';
+
+  document.getElementById('bloqueDatos').scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+
+const selProv = document.getElementById('provincia');
+const selLoc  = document.getElementById('localidad');
+const selSuc  = document.getElementById('sucursal');
+
+const provs = [...new Set(DB.map(r=>r[0]))].sort();
+provs.forEach(p => {
+  const o = document.createElement('option');
+  o.value = o.textContent = p;
+  selProv.appendChild(o);
+});
+
+selProv.addEventListener('change', () => {
+  const prov = selProv.value;
+  selLoc.innerHTML = '<option value="">— Elegí una localidad —</option>';
+  selSuc.innerHTML = '<option value="">— Primero elegí una localidad —</option>';
+  selLoc.disabled = !prov;
+  selSuc.disabled = true;
+  document.getElementById('sucInfo').classList.remove('visible');
+  if (!prov) return;
+  [...new Set(DB.filter(r=>r[0]===prov).map(r=>r[1]))].sort().forEach(l => {
+    const o = document.createElement('option');
+    o.value = o.textContent = l;
+    selLoc.appendChild(o);
+  });
+});
+
+selLoc.addEventListener('change', () => {
+  const prov = selProv.value, loc = selLoc.value;
+  selSuc.innerHTML = '<option value="">— Elegí una sucursal —</option>';
+  selSuc.disabled = !loc;
+  document.getElementById('sucInfo').classList.remove('visible');
+  if (!loc) return;
+  DB.filter(r=>r[0]===prov&&r[1]===loc).map(r=>r[2]).sort().forEach(s => {
+    const o = document.createElement('option');
+    o.value = o.textContent = s;
+    selSuc.appendChild(o);
+  });
+});
+
+selSuc.addEventListener('change', () => {
+  const dato = DB.find(r=>r[0]===selProv.value&&r[1]===selLoc.value&&r[2]===selSuc.value);
+  if (dato) {
+    document.getElementById('sucDir').textContent = dato[3];
+    document.getElementById('sucCP').textContent  = dato[4];
+    document.getElementById('sucInfo').classList.add('visible');
+    document.getElementById('sd3').classList.add('active');
+    document.getElementById('sl2').classList.add('done');
+    document.getElementById('sd2').classList.add('done');
+    document.getElementById('sd2').textContent = '✓';
+  }
+});
+
+document.getElementById('form').addEventListener('submit', e => {
+  e.preventDefault();
+  const nombre   = document.getElementById('nombre').value.trim();
+  const email    = document.getElementById('email').value.trim();
+  const telefono = document.getElementById('telefono').value.trim();
+  if (!tipoEnvio || !nombre || !email || !telefono) {
+    alert('Completá todos los campos obligatorios (*)');
+    return;
+  }
+  if (tipoEnvio==='domicilio') {
+    const calle = document.getElementById('calle').value.trim();
+    const cp    = document.getElementById('cpDomicilio').value.trim();
+    const ciu   = document.getElementById('ciudadDomicilio').value.trim();
+    const prov  = document.getElementById('provinciaDomicilio').value.trim();
+    if (!calle||!cp||!ciu||!prov) { alert('Completá todos los campos de dirección (*)'); return; }
+  } else {
+    if (!selProv.value||!selLoc.value||!selSuc.value) {
+      alert('Elegí provincia, localidad y sucursal'); return;
+    }
+  }
+
+  const btn = document.getElementById('btnEnviar');
+  btn.disabled = true;
+  btn.textContent = 'Enviando...';
+
+  let detalle = '';
+  if (tipoEnvio==='domicilio') {
+    const calle = document.getElementById('calle').value;
+    const piso  = document.getElementById('piso').value;
+    const cp    = document.getElementById('cpDomicilio').value;
+    const ciu   = document.getElementById('ciudadDomicilio').value;
+    const prov  = document.getElementById('provinciaDomicilio').value;
+    const ind   = document.getElementById('indicaciones').value;
+    detalle = `<strong>Tipo:</strong> Envío a domicilio<br><strong>Dirección:</strong> ${calle}${piso?' '+piso:''}<br><strong>Localidad:</strong> ${ciu}, ${prov} (${cp})${ind?'<br><strong>Indicaciones:</strong> '+ind:''}`;
+  } else {
+    const dir = document.getElementById('sucDir').textContent;
+    const cp  = document.getElementById('sucCP').textContent;
+    detalle = `<strong>Tipo:</strong> Retiro en sucursal<br><strong>Sucursal:</strong> ${selSuc.value}<br><strong>Localidad:</strong> ${selLoc.value}, ${selProv.value}<br><strong>Dirección:</strong> ${dir}<br><strong>Cód. postal:</strong> ${cp}`;
+  }
+
+  document.getElementById('form').style.display = 'none';
+  document.getElementById('sNombre').textContent = nombre;
+  document.getElementById('sDetalle').innerHTML = detalle;
+  document.getElementById('successBox').classList.add('visible');
+
+  document.getElementById('sd3').classList.add('done');
+  document.getElementById('sd3').textContent = '✓';
+  document.getElementById('sl2').classList.add('done');
+});
+</script>
+</body>
+</html>
