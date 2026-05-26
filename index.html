@@ -342,7 +342,21 @@ document.getElementById('form').addEventListener('submit', e => {
     const cp  = document.getElementById('sucCP').textContent;
     detalle = `<strong>Tipo:</strong> Retiro en sucursal<br><strong>Sucursal:</strong> ${selSuc.value}<br><strong>Localidad:</strong> ${selLoc.value}, ${selProv.value}<br><strong>Dirección:</strong> ${dir}<br><strong>Cód. postal:</strong> ${cp}`;
   }
-
+  fetch("https://script.google.com/macros/s/AKfycby1SpIWCMIS62KXgEnAk7HwN3ogwnyFodJDY4-mGae-70pN9XU93_f-mLkUMK0xDRU/exec", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      nombre: nombre,
+      email: email,
+      telefono: telefono,
+      tipoEnvio: tipoEnvio,
+      detalle: detalle
+    })
+  })
+  .then(response => console.log("Guardado en Sheets"))
+  .catch(error => console.error(error));
   document.getElementById('form').style.display = 'none';
   document.getElementById('sNombre').textContent = nombre;
   document.getElementById('sDetalle').innerHTML = detalle;
